@@ -1,9 +1,9 @@
 import cv2
-from cvzone.HandTrackingModule import HandDetector
+from ahmercv import HandTracker
 
 # Setup
 cap = cv2.VideoCapture(0)
-detector = HandDetector(detectionCon=0.8, maxHands=1)
+tracker = HandTracker(max_hands=1, detection_confidence=0.8)
 
 canvas = None
 prev_x, prev_y = 0, 0
@@ -16,14 +16,11 @@ while True:
     if canvas is None:
         canvas = frame.copy() * 0
 
-    # Detect hands
-    hands, frame = detector.findHands(frame)
+    # Detect hands using ahmercv
+    hands, frame = tracker.find_hands(frame)
 
     if hands and drawing:
-        hand = hands[0]
-        lmList = hand['lmList']
-
-        x, y = lmList[8][0], lmList[8][1]
+        x, y = tracker.get_finger_position(hands, finger=8)
 
         if prev_x == 0 and prev_y == 0:
             prev_x, prev_y = x, y
